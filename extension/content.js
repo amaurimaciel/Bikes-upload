@@ -1,4 +1,5 @@
 (function() {
+  const API_KEY = ''; // Set your API key here
   // Utility to create the side panel
   function createPanel() {
     let panel = document.getElementById('bike-assistant-panel');
@@ -17,11 +18,17 @@
     panel.style.fontSize = '14px';
     panel.style.fontFamily = 'sans-serif';
     document.body.appendChild(panel);
-    panel.innerHTML = '<h2 style="padding:10px">Bike Assistant</h2>' +
-                     '<button id="bike-assistant-fetch" style="margin:10px">Analyze</button>' +
-                     '<button id="bike-assistant-fill" style="margin:10px">Fill Form</button>' +
-                     '<button id="bike-assistant-download" style="margin:10px">Download CSV</button>' +
-                     '<pre id="bike-assistant-output" style="white-space:pre-wrap;padding:10px"></pre>';
+    panel.innerHTML =
+      '<h2 style="padding:10px">Bike Assistant</h2>' +
+      '<button id="bike-assistant-fetch" style="margin:10px">Analyze</button>' +
+      '<button id="bike-assistant-fill" style="margin:10px">Fill Form</button>' +
+      '<button id="bike-assistant-download" style="margin:10px">Download CSV</button>' +
+      '<div style="padding:10px">' +
+      '<h3>Input CSV</h3>' +
+      '<pre id="bike-assistant-input" style="white-space:pre-wrap;border:1px solid #ccc;padding:5px"></pre>' +
+      '<h3>Output CSV</h3>' +
+      '<pre id="bike-assistant-output" style="white-space:pre-wrap;border:1px solid #ccc;padding:5px"></pre>' +
+      '</div>';
     return panel;
   }
 
@@ -67,26 +74,45 @@
     return { fields, photos };
   }
 
-  // Build prompt for API
-  function buildPrompt(data) {
-    return `Analyze the following bike information and suggest values for missing fields. Return a CSV with the columns: field, certainty(0-100), suggestion, source, details.\nData: ${JSON.stringify(data)}.`;
+  function buildInputCSV(data) {
+    const lines = [];
+    Object.entries(data.fields).forEach(([k, v]) => {
+      lines.push(`${k},${v}`);
+    });
+    data.photos.forEach((p, idx) => {
+      lines.push(`photo${idx + 1},${p}`);
+    });
+    return lines.join('\n');
   }
 
-  async function fetchSuggestions(data) {
-    const prompt = buildPrompt(data);
-    // Placeholder API call - replace with real endpoint
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': 'Bearer YOUR_KEY'
-      },
-      body: JSON.stringify({model: 'gpt-3.5-turbo', messages: [{role:'user', content: prompt}]})
-    });
-    const res = await response.json();
-    // Expect assistant message with CSV
-    const csv = res.choices?.[0]?.message?.content || '';
-    return csv;
+  // Build prompt for API
+  function buildPrompt(csv) {
+    return (
+      'Analyze the following bike information provided as CSV with columns "field,value". ' +
+      'Return a CSV with columns field, certainty(0-100), suggestion, source, details.\n' +
+      csv
+    );
+  }
+
+  async function fetchSuggestions(csv) {
+    if (!API_KEY) {
+      throw new Error('API key missing');
+    }
+    const prompt = buildPrompt(csv);
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + API_KEY
+        },
+        body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: prompt }] })
+      });
+      const res = await response.json();
+      return res.choices?.[0]?.message?.content || '';
+    } catch (err) {
+      throw new Error('Fetch failed: ' + err.message);
+    }
   }
 
   function downloadCSV(text) {
@@ -148,9 +174,16 @@
   const panel = createPanel();
   document.getElementById('bike-assistant-fetch').addEventListener('click', async () => {
     const data = collectData();
-    const csv = await fetchSuggestions(data);
-    document.getElementById('bike-assistant-output').textContent = csv;
-    panel.dataset.csv = csv;
+    const inputCSV = buildInputCSV(data);
+    document.getElementById('bike-assistant-input').textContent = inputCSV;
+    panel.dataset.inputCsv = inputCSV;
+    try {
+      const outputCSV = await fetchSuggestions(inputCSV);
+      document.getElementById('bike-assistant-output').textContent = outputCSV;
+      panel.dataset.csv = outputCSV;
+    } catch (err) {
+      document.getElementById('bike-assistant-output').textContent = 'Error: ' + err.message;
+    }
   });
   document.getElementById('bike-assistant-fill').addEventListener('click', () => {
     if (panel.dataset.csv) fillFormFromCSV(panel.dataset.csv);

@@ -4,6 +4,7 @@
   "version": "0.1",
   "description": "Assist with bike cataloging by extracting page info and querying an API for recommendations.",
   "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["https://api.openai.com/*"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
