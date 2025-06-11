@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head><title>Configurações</title></head>
+<body>
+  <h2>Configurações da Extensão</h2>
+
+  <label>🔑 Chave da API OpenAI:</label><br/>
+  <input type="text" id="apiKey" style="width: 100%"><br/><br/>
+
+  <label>⚙️ Prompt padrão:</label><br/>
+  <textarea id="prompt" rows="6" style="width: 100%"></textarea><br/>
+
+  <label>🤖 Modelo:</label><br/>
+  <select id="modelo" style="width: 100%">
+    <option value="gpt-4o">GPT-4o</option>
+    <option value="gpt-4-turbo">GPT-4 Turbo</option>
+    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+  </select><br/><br/>
+
+  <button id="salvar">Salvar</button>
+  <script src="config.js"></script>
+</body>
+</html>

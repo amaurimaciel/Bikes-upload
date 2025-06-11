@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Upway Bike Analyzer</title>
+    <style>
+      body {
+        width: 400px;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .menu-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+      }
+      .menu-button img {
+        width: 24px;
+        height: 24px;
+      }
+      .menu {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+      .menu.show {
+        display: block;
+      }
+      .menu-item {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #333;
+        cursor: pointer;
+      }
+      .menu-item:hover {
+        background: #f0f0f0;
+      }
+      .version {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .status {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        display: none;
+      }
+      .status.success {
+        background-color: #dff0d8;
+        color: #3c763d;
+        display: block;
+      }
+      .status.error {
+        background-color: #f2dede;
+        color: #a94442;
+        display: block;
+      }
+      #analysis-result {
+        margin-top: 15px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+        <div class="header">
+            <h2>Upway Bike Analyzer</h2>
+            <button class="menu-button" id="menu-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3,6 L21,6 C21.5522847,6 22,5.55228475 22,5 C22,4.44771525 21.5522847,4 21,4 L3,4 C2.44771525,4 2,4.44771525 2,5 C2,5.55228475 2.44771525,6 3,6 Z" fill="#000000"/>
+                    <path d="M3,13 L21,13 C21.5522847,13 22,12.5522847 22,12 C22,11.4477153 21.5522847,11 21,11 L3,11 C2.44771525,11 2,11.4477153 2,12 C2,12.5522847 2.44771525,13 3,13 Z" fill="#000000"/>
+                    <path d="M3,20 L21,20 C21.5522847,20 22,19.5522847 22,19 C22,18.4477153 21.5522847,18 21,18 L3,18 C2.44771525,18 2,18.4477153 2,19 C2,19.5522847 2.44771525,20 3,20 Z" fill="#000000"/>
+                </svg>
+            </button>
+            <div class="menu" id="menu">
+                <a class="menu-item" id="config-btn">Configurações</a>
+                <div class="version">Versão 1.0.0</div>
+            </div>
+        </div>
+        <button id="start-btn">Capturar Dados</button>
+        <button id="analyze-btn">Analisar com IA</button>
+        <div id="status" class="status"></div>
+        <div id="analysis-result"></div>
+    </div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
